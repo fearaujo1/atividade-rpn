@@ -7,7 +7,7 @@ public class ConversorRPN {
         Pilha<String> operadores = new Pilha<>();
         StringBuilder saida = new StringBuilder();
 
-        String[] elementos = expressao.trim().split("\\s+");
+        String[] elementos = tokenizar(expressao);
 
         for (String elemento : elementos) {
 
@@ -99,5 +99,55 @@ public class ConversorRPN {
         }
 
         return 0;
+    }
+
+    private String[] tokenizar(String expressao) {
+
+        StringBuilder numero = new StringBuilder();
+        java.util.List<String> elementos = new java.util.ArrayList<>();
+
+        for (int i = 0; i < expressao.length(); i++) {
+
+            char caractere = expressao.charAt(i);
+
+            if (Character.isDigit(caractere) || caractere == '.') {
+
+                numero.append(caractere);
+
+            } else if (caractere == ' '
+                    || caractere == '\t') {
+
+                if (numero.length() > 0) {
+                    elementos.add(numero.toString());
+                    numero.setLength(0);
+                }
+
+            } else if (caractere == '+'
+                    || caractere == '-'
+                    || caractere == '*'
+                    || caractere == '/'
+                    || caractere == '('
+                    || caractere == ')') {
+
+                if (numero.length() > 0) {
+                    elementos.add(numero.toString());
+                    numero.setLength(0);
+                }
+
+                elementos.add(String.valueOf(caractere));
+
+            } else {
+
+                throw new IllegalArgumentException(
+                        "Caractere inválido: " + caractere
+                );
+            }
+        }
+
+        if (numero.length() > 0) {
+            elementos.add(numero.toString());
+        }
+
+        return elementos.toArray(new String[0]);
     }
 }
