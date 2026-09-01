@@ -4,22 +4,55 @@ public class ConversorRPN {
 
     public String converter(String expressao) {
 
+        if (expressao == null || expressao.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                    "A expressão não pode ser vazia."
+            );
+        }
+
         Pilha<String> operadores = new Pilha<>();
         StringBuilder saida = new StringBuilder();
 
         String[] elementos = tokenizar(expressao);
 
+        // Indica se o próximo elemento esperado deve ser um número
+        boolean esperandoNumero = true;
+
         for (String elemento : elementos) {
 
             if (ehNumero(elemento)) {
+
+                if (!esperandoNumero) {
+                    throw new IllegalArgumentException(
+                            "Dois números consecutivos."
+                    );
+                }
+
                 saida.append(elemento).append(" ");
+
+                esperandoNumero = false;
             }
 
             else if (elemento.equals("(")) {
+
+                if (!esperandoNumero) {
+                    throw new IllegalArgumentException(
+                            "Parêntese de abertura em posição inválida."
+                    );
+                }
+
                 operadores.push(elemento);
+
+                esperandoNumero = true;
             }
 
             else if (elemento.equals(")")) {
+
+                if (esperandoNumero) {
+                    throw new IllegalArgumentException(
+                            "Parêntese de fechamento em posição inválida."
+                    );
+                }
 
                 while (!operadores.isEmpty()
                         && !operadores.peek().equals("(")) {
@@ -33,26 +66,46 @@ public class ConversorRPN {
                     );
                 }
 
+                // Remove o "(" da pilha
                 operadores.pop();
+
+                esperandoNumero = false;
             }
 
             else if (ehOperador(elemento)) {
 
+                if (esperandoNumero) {
+                    throw new IllegalArgumentException(
+                            "Operador em posição inválida: " + elemento
+                    );
+                }
+
                 while (!operadores.isEmpty()
                         && !operadores.peek().equals("(")
-                        && precedencia(operadores.peek()) >= precedencia(elemento)) {
+                        && precedencia(operadores.peek())
+                        >= precedencia(elemento)) {
 
                     saida.append(operadores.pop()).append(" ");
                 }
 
                 operadores.push(elemento);
+
+                esperandoNumero = true;
             }
+
 
             else {
                 throw new IllegalArgumentException(
                         "Elemento inválido: " + elemento
                 );
             }
+        }
+
+
+        if (esperandoNumero) {
+            throw new IllegalArgumentException(
+                    "A expressão não pode terminar com um operador."
+            );
         }
 
         while (!operadores.isEmpty()) {
@@ -68,6 +121,7 @@ public class ConversorRPN {
 
         return saida.toString().trim();
     }
+
 
     private boolean ehNumero(String elemento) {
 
@@ -104,25 +158,32 @@ public class ConversorRPN {
     private String[] tokenizar(String expressao) {
 
         StringBuilder numero = new StringBuilder();
-        java.util.List<String> elementos = new java.util.ArrayList<>();
+
+        java.util.List<String> elementos =
+                new java.util.ArrayList<>();
 
         for (int i = 0; i < expressao.length(); i++) {
 
             char caractere = expressao.charAt(i);
 
-            if (Character.isDigit(caractere) || caractere == '.') {
+
+            if (Character.isDigit(caractere)
+                    || caractere == '.') {
 
                 numero.append(caractere);
+            }
 
-            } else if (caractere == ' '
+            else if (caractere == ' '
                     || caractere == '\t') {
 
                 if (numero.length() > 0) {
+
                     elementos.add(numero.toString());
                     numero.setLength(0);
                 }
+            }
 
-            } else if (caractere == '+'
+            else if (caractere == '+'
                     || caractere == '-'
                     || caractere == '*'
                     || caractere == '/'
@@ -130,13 +191,15 @@ public class ConversorRPN {
                     || caractere == ')') {
 
                 if (numero.length() > 0) {
+
                     elementos.add(numero.toString());
                     numero.setLength(0);
                 }
 
                 elementos.add(String.valueOf(caractere));
+            }
 
-            } else {
+            else {
 
                 throw new IllegalArgumentException(
                         "Caractere inválido: " + caractere
@@ -144,10 +207,13 @@ public class ConversorRPN {
             }
         }
 
+        // Adiciona o último número encontrado
         if (numero.length() > 0) {
+
             elementos.add(numero.toString());
         }
 
         return elementos.toArray(new String[0]);
     }
 }
+
