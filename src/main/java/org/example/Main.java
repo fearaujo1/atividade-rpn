@@ -4,13 +4,13 @@ public class Main {
 
     public static void main(String[] args) {
 
-        ConversorRPN conversor = new ConversorRPN();
+        CalculadoraRPN calculadora = new CalculadoraRPN();
 
-        String expressao = "( 10.5 + 2.5 ) * 2";
+        String expressaoRPN = "10 5 2 * +";
 
-        String rpn = conversor.converter(expressao);
+        double resultado = calculadora.calcular(expressaoRPN);
 
-        System.out.println("Expressão original: " + expressao);
-        System.out.println("Expressão RPN: " + rpn);
+        System.out.println("RPN: " + expressaoRPN);
+        System.out.println("Resultado: " + resultado);
     }
 }
