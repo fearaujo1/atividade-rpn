@@ -4,17 +4,13 @@ public class Main {
 
     public static void main(String[] args) {
 
-        Pilha<Double> pilha = new Pilha<>();
+        ConversorRPN conversor = new ConversorRPN();
 
-        pilha.push(10.0);
-        pilha.push(20.0);
-        pilha.push(30.0);
+        String expressao = "( 10.5 + 2.5 ) * 2";
 
-        System.out.println("Topo: " + pilha.peek());
-        System.out.println("Tamanho: " + pilha.size());
+        String rpn = conversor.converter(expressao);
 
-        System.out.println("Removido: " + pilha.pop());
-        System.out.println("Novo topo: " + pilha.peek());
-        System.out.println("Tamanho: " + pilha.size());
+        System.out.println("Expressão original: " + expressao);
+        System.out.println("Expressão RPN: " + rpn);
     }
 }
